@@ -19,10 +19,10 @@
     <h1>slack-feed-proxy</h1>
     <ul>
       <li>
-        <code>https://{{printf "%s" .host}}/p?feed={url}</code>
+        <code>{{.origin}}/p?feed={url}</code>
       </li>
       <li>
-        <code>https://{{printf "%s" .host}}/p?feed={url}&org={org}&channel={channel}</code><br />
+        <code>{{.origin}}/p?feed={url}&org={org}&channel={channel}</code><br />
         (enable redirector to log where clicks are from)
       </li>
     </ul>

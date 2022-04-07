@@ -15,7 +15,7 @@ func (e ErrUnExpectedFormat) Error() string {
 }
 
 type TransformConfig struct {
-	ProxyHost     string
+	ProxyOrigin   string
 	Org           string
 	Channel       string
 	UseRedirector bool
@@ -62,7 +62,7 @@ func addTitleNotice(title string) string {
 }
 
 func tapRedirector(link string, conf TransformConfig) string {
-	u, _ := url.Parse(fmt.Sprintf("https://%s", conf.ProxyHost))
+	u, _ := url.Parse(conf.ProxyOrigin)
 	u.Path = "/r"
 
 	q := u.Query()

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"google.golang.org/appengine/v2/log"
@@ -58,7 +59,7 @@ func ProxyFeed(w http.ResponseWriter, r *http.Request) {
 	}
 
 	conf := TransformConfig{
-		ProxyHost:     r.Host,
+		ProxyOrigin:   ServerOrigin(r.Host),
 		Org:           q.Get("org"),
 		Channel:       q.Get("channel"),
 		UseRedirector: q.Get("org") != "" || q.Get("channel") != "",
@@ -83,4 +84,14 @@ func ProxyFeed(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "public, max-age=300")
 	w.WriteHeader(http.StatusOK)
 	wt.WriteTo(w)
+}
+
+func ServerOrigin(host string) string {
+	var scheme string
+	if strings.HasPrefix(host, "localhost") || strings.HasPrefix(host, "127.0.0.1") {
+		scheme = "http"
+	} else {
+		scheme = "https"
+	}
+	return fmt.Sprintf("%s://%s", scheme, host)
 }
