@@ -68,16 +68,24 @@ func ProxyFeed(w http.ResponseWriter, r *http.Request) {
 	_, wt, err := Transform(resp.Body, conf)
 	if err != nil {
 		var code int
+		var msg string
+
+		var errParse ErrXMLParseFailed
 		var errFormat ErrUnExpectedFormat
-		if errors.As(err, &errFormat) {
+		if errors.As(err, &errParse) || errors.As(err, &errFormat) {
 			code = http.StatusBadRequest
+			msg = err.Error()
 		} else {
 			code = http.StatusInternalServerError
 		}
 
 		w.WriteHeader(code)
 		fmt.Fprintln(w, http.StatusText(code))
+		if msg != "" {
+			fmt.Fprintln(w, msg)
+		}
 		log.Warningf(r.Context(), "Failed to transfrom a feed: %v", err)
+
 		return
 	}
 

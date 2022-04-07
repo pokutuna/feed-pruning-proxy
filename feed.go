@@ -8,10 +8,16 @@ import (
 	"github.com/beevik/etree"
 )
 
+type ErrXMLParseFailed error
+
+func NewErrXMLParseFailed(err error) ErrXMLParseFailed {
+	return ErrXMLParseFailed(fmt.Errorf("failed to parse: %w", err))
+}
+
 type ErrUnExpectedFormat string
 
 func (e ErrUnExpectedFormat) Error() string {
-	return fmt.Sprintf("unexpected format: %s", string(e))
+	return fmt.Sprintf("unexpected feed format: %s", string(e))
 }
 
 type TransformConfig struct {
@@ -22,10 +28,9 @@ type TransformConfig struct {
 }
 
 func Transform(feed io.Reader, conf TransformConfig) (string, io.WriterTo, error) {
-
 	doc := etree.NewDocument()
 	if _, err := doc.ReadFrom(feed); err != nil {
-		return "", nil, err
+		return "", nil, NewErrXMLParseFailed(err)
 	}
 
 	var editor FeedEditor
