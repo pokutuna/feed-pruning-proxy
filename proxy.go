@@ -65,7 +65,7 @@ func ProxyFeed(w http.ResponseWriter, r *http.Request) {
 		UseRedirector: q.Get("org") != "" || q.Get("channel") != "",
 	}
 
-	ct, wt, err := Transform(resp.Body, conf)
+	_, wt, err := Transform(resp.Body, conf)
 	if err != nil {
 		var code int
 		var errFormat ErrUnExpectedFormat
@@ -74,13 +74,14 @@ func ProxyFeed(w http.ResponseWriter, r *http.Request) {
 		} else {
 			code = http.StatusInternalServerError
 		}
+
 		w.WriteHeader(code)
 		fmt.Fprintln(w, http.StatusText(code))
 		log.Warningf(r.Context(), "Failed to transfrom a feed: %v", err)
 		return
 	}
 
-	w.Header().Set("Content-Type", ct)
+	w.Header().Set("Content-Type", "application/xml") // or respect the original content-type?
 	w.Header().Set("Cache-Control", "public, max-age=300")
 	w.WriteHeader(http.StatusOK)
 	wt.WriteTo(w)

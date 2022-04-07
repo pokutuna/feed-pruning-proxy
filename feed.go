@@ -29,14 +29,11 @@ func Transform(feed io.Reader, conf TransformConfig) (string, io.WriterTo, error
 	}
 
 	var editor FeedEditor
-	var contentType string
 	format := doc.Root().Tag
 	if format == "rss" {
 		editor = RSSFeedEditor{}
-		contentType = "application/rss+xml; charset=utf-8"
 	} else if format == "feed" {
 		editor = AtomFeedEditor{}
-		contentType = "application/atom+xml; charset=utf-8"
 	} else {
 		return "", nil, ErrUnExpectedFormat(format)
 	}
@@ -48,7 +45,7 @@ func Transform(feed io.Reader, conf TransformConfig) (string, io.WriterTo, error
 		editor.TapRedirector(doc, conf)
 	}
 
-	return contentType, doc, nil
+	return format, doc, nil
 }
 
 type FeedEditor interface {
