@@ -97,7 +97,7 @@ func (e RSSFeedEditor) RemoveEntryContent(doc *etree.Document) {
 func (e RSSFeedEditor) TapRedirector(doc *etree.Document, conf TransformConfig) {
 	for _, i := range doc.FindElements("/rss/channel/item") {
 		if d := i.SelectElement("link"); d != nil {
-			i.SetText(tapRedirector(d.Text(), conf))
+			d.SetText(tapRedirector(d.Text(), conf))
 		}
 	}
 }
@@ -124,7 +124,9 @@ func (e AtomFeedEditor) RemoveEntryContent(doc *etree.Document) {
 func (e AtomFeedEditor) TapRedirector(doc *etree.Document, conf TransformConfig) {
 	for _, i := range doc.FindElements("/feed/entry") {
 		if d := i.SelectElement("link"); d != nil {
-			i.SetText(tapRedirector(d.SelectAttrValue("href", ""), conf))
+			u := d.SelectAttrValue("href", "")
+			d.RemoveAttr("href")
+			d.CreateAttr("href", tapRedirector(u, conf))
 		}
 	}
 }
