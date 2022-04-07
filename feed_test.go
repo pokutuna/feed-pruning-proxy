@@ -1,5 +1,79 @@
 package main
 
+import (
+	"strings"
+	"testing"
+
+	"github.com/beevik/etree"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestRSSFeedEditor(t *testing.T) {
+	editor := RSSFeedEditor{}
+	doc := etree.NewDocument()
+
+	reload := func() {
+		_, err := doc.ReadFrom(strings.NewReader(rssfeed))
+		assert.NoError(t, err)
+	}
+
+	t.Run("UpdateFeedTitle", func(t *testing.T) {
+		reload()
+
+		editor.UpdateFeedTitle(doc)
+
+		title := doc.FindElement("/rss/channel/title").Text()
+		assert.Equal(t, "ぽ靴な缶 (with slack-feed-proxy)", title)
+	})
+
+	t.Run("RemoveEntryContent", func(t *testing.T) {
+		reload()
+
+		item := doc.FindElement("/rss/channel/item")
+
+		assert.NotNil(t, item.SelectElement("description"))
+		editor.RemoveEntryContent(doc)
+		assert.Nil(t, item.SelectElement("description"))
+	})
+
+	t.Run("TapRedirector", func(t *testing.T) {
+	})
+}
+
+func TestAtomFeedEditor(t *testing.T) {
+	editor := AtomFeedEditor{}
+	doc := etree.NewDocument()
+
+	reload := func() {
+		_, err := doc.ReadFrom(strings.NewReader(atomfeed))
+		assert.NoError(t, err)
+	}
+
+	t.Run("UpdateFeedTitle", func(t *testing.T) {
+		reload()
+
+		editor.UpdateFeedTitle(doc)
+
+		title := doc.FindElement("/feed/title").Text()
+		assert.Equal(t, "ぽ靴な缶 (with slack-feed-proxy)", title)
+	})
+
+	t.Run("RemoveEntryContent", func(t *testing.T) {
+		reload()
+
+		item := doc.FindElement("/feed/entry")
+
+		assert.NotNil(t, item.SelectElement("summary"))
+		assert.NotNil(t, item.SelectElement("content"))
+		editor.RemoveEntryContent(doc)
+		assert.Nil(t, item.SelectElement("summary"))
+		assert.Nil(t, item.SelectElement("content"))
+	})
+
+	t.Run("TapRedirector", func(t *testing.T) {
+	})
+}
+
 var rssfeed = `
 <?xml version="1.0"?>
 <rss version="2.0">

@@ -10,4 +10,8 @@ deploy:
 
 .PHONY: localup
 localup:
-	go build && open http://localhost:8080 && ./slack-feed-proxy
+	go build && echo 'open http://localhost:8080' && ./slack-feed-proxy
+
+.PHONY: test
+test:
+	go test -cover -v ./...

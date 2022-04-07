@@ -60,7 +60,7 @@ type FeedEditor interface {
 }
 
 func addTitleNotice(title string) string {
-	return title + " (with slack-feed-proxy)"
+	return fmt.Sprintf("%s (with slack-feed-proxy)", title)
 }
 
 func tapRedirector(link string, conf TransformConfig) string {
