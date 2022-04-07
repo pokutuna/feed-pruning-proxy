@@ -1,0 +1,9 @@
+# ignore all
+/*
+
+# upload list
+!/app.yaml
+!/*.go
+!/*.sum
+!/*.mod
+!/index.html

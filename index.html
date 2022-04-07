@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>slack-feed-proxy</title>
+    <style>
+      body {
+        margin: 2em;
+      }
+      code {
+        font-size: large;
+      }
+      li {
+        margin-bottom: 0.5em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>slack-feed-proxy</h1>
+    <ul>
+      <li>
+        <code>https://{{printf "%s" .host}}/p?feed={url}</code>
+      </li>
+      <li>
+        <code>https://{{printf "%s" .host}}/p?feed={url}&org={org}&channel={channel}</code><br />
+        (enable redirector to log where clicks are from)
+      </li>
+    </ul>
+  </body>
+</html>
