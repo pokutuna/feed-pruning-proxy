@@ -26,7 +26,7 @@ type TransformConfig struct {
 	Org           string
 	Channel       string
 	UseRedirector bool
-	Diet          bool // when true = diet
+	Diet          bool // when false = remove
 }
 
 func Transform(feed io.Reader, conf TransformConfig) (string, io.WriterTo, error) {
