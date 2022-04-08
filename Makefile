@@ -10,7 +10,7 @@ deploy:
 
 .PHONY: localup
 localup:
-	go build && echo 'open http://localhost:8080' && ./slack-feed-proxy
+	go build && echo 'open http://localhost:8080' && GOOGLE_CLOUD_PROJECT=$(PROJECT) ./slack-feed-proxy
 
 .PHONY: test
 test:

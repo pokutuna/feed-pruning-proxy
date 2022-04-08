@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
 	"google.golang.org/appengine/v2/log"
@@ -15,6 +16,7 @@ type RedirectionLog struct {
 	URL         string      `json:"url"`
 	Org         string      `json:"org"`
 	Channel     string      `json:"channel"`
+	Trace
 }
 
 type HttpRequest struct {
@@ -33,8 +35,13 @@ func Redirect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	http.Redirect(w, r, url, http.StatusFound)
+
 	isSlackbot := strings.Contains(r.UserAgent(), "Slackbot")
 	if !isSlackbot {
+
+		t := GetTrace(r, os.Getenv("GOOGLE_CLOUD_PROJECT"))
+
 		l := RedirectionLog{
 			LogType: "redirect",
 			HttpRequest: HttpRequest{
@@ -45,10 +52,9 @@ func Redirect(w http.ResponseWriter, r *http.Request) {
 			URL:     url,
 			Org:     q.Get("org"),
 			Channel: q.Get("channel"),
+			Trace:   t,
 		}
 		j, _ := json.Marshal(l)
 		log.Infof(r.Context(), "%s", j)
 	}
-
-	http.Redirect(w, r, url, http.StatusFound)
 }
