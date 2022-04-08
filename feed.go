@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/beevik/etree"
+	"github.com/microcosm-cc/bluemonday"
 )
 
 type ErrXMLParseFailed error
@@ -54,8 +55,18 @@ func Transform(feed io.Reader, conf TransformConfig) (string, io.WriterTo, error
 }
 
 type FeedEditor interface {
+	// Add "(with slack-feed-proxy)" notice to feed title
 	UpdateFeedTitle(doc *etree.Document)
+
+	// Remove entry contents
+	// Slack expands not only the page link but also links contained in these. Noisy!
 	RemoveEntryContent(doc *etree.Document)
+
+	// Remove links in entry contents
+	DietEntryContent(doc *etree.Document)
+
+	// Replace entry links with redirector
+	// The flood of feeds no one reading flushes out human conversations. Stop Robots Empire!
 	TapRedirector(doc *etree.Document, conf TransformConfig)
 }
 
@@ -80,6 +91,11 @@ func tapRedirector(link string, conf TransformConfig) string {
 	return u.String()
 }
 
+func stripTags(text string) string {
+	p := bluemonday.StrictPolicy()
+	return p.Sanitize(text)
+}
+
 type RSSFeedEditor struct{}
 
 func (e RSSFeedEditor) UpdateFeedTitle(doc *etree.Document) {
@@ -92,6 +108,14 @@ func (e RSSFeedEditor) RemoveEntryContent(doc *etree.Document) {
 	for _, i := range doc.FindElements("/rss/channel/item") {
 		if d := i.SelectElement("description"); d != nil {
 			i.RemoveChild(d)
+		}
+	}
+}
+
+func (e RSSFeedEditor) DietEntryContent(doc *etree.Document) {
+	for _, i := range doc.FindElements("/rss/channel/item") {
+		if d := i.SelectElement("description"); d != nil {
+			d.SetText(stripTags(d.Text()))
 		}
 	}
 }
@@ -119,6 +143,17 @@ func (e AtomFeedEditor) RemoveEntryContent(doc *etree.Document) {
 		}
 		if d := i.SelectElement("content"); d != nil {
 			i.RemoveChild(d)
+		}
+	}
+}
+
+func (e AtomFeedEditor) DietEntryContent(doc *etree.Document) {
+	for _, i := range doc.FindElements("/feed/entry") {
+		if d := i.SelectElement("summary"); d != nil {
+			d.SetText(stripTags(d.Text()))
+		}
+		if d := i.SelectElement("content"); d != nil {
+			d.SetText(stripTags(d.Text()))
 		}
 	}
 }
