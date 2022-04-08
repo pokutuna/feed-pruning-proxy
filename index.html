@@ -11,7 +11,7 @@
         font-size: large;
       }
       li {
-        margin-bottom: 0.5em;
+        margin-bottom: 1em;
       }
     </style>
   </head>
@@ -19,11 +19,16 @@
     <h1>slack-feed-proxy</h1>
     <ul>
       <li>
-        <code>{{.origin}}/p?feed={url}</code>
+        <code>{{.origin}}/p?feed={url}</code><br />
+        remove body contents (e.g. description, summary, content)
+      </li>
+      <li>
+        <code>{{.origin}}/p?feed={url}&diet</code><br />
+        replace markup from body contents
       </li>
       <li>
         <code>{{.origin}}/p?feed={url}&org={org}&channel={channel}</code><br />
-        (enable redirector to log where clicks are from)
+        enable redirector to log where clicks are from
       </li>
     </ul>
   </body>

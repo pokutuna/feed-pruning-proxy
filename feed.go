@@ -26,6 +26,7 @@ type TransformConfig struct {
 	Org           string
 	Channel       string
 	UseRedirector bool
+	Diet          bool // when true = diet
 }
 
 func Transform(feed io.Reader, conf TransformConfig) (string, io.WriterTo, error) {
@@ -45,7 +46,12 @@ func Transform(feed io.Reader, conf TransformConfig) (string, io.WriterTo, error
 	}
 
 	editor.UpdateFeedTitle(doc)
-	editor.RemoveEntryContent(doc)
+
+	if conf.Diet {
+		editor.DietEntryContent(doc)
+	} else {
+		editor.RemoveEntryContent(doc)
+	}
 
 	if conf.UseRedirector {
 		editor.TapRedirector(doc, conf)
