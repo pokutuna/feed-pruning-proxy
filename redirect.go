@@ -14,8 +14,8 @@ type RedirectionLog struct {
 	LogType     string      `json:"type"`
 	HttpRequest HttpRequest `json:"httpRequest"`
 	URL         string      `json:"url"`
-	Org         string      `json:"org"`
-	Channel     string      `json:"channel"`
+	Org         string      `json:"org,omitempty"`
+	Channel     string      `json:"channel,omitempty"`
 	Trace
 }
 

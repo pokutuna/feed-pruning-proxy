@@ -29,10 +29,10 @@ type TransformConfig struct {
 	Diet          bool // when false = remove
 }
 
-func Transform(feed io.Reader, conf TransformConfig) (string, io.WriterTo, error) {
+func Transform(feed io.Reader, conf TransformConfig) (io.WriterTo, error) {
 	doc := etree.NewDocument()
 	if _, err := doc.ReadFrom(feed); err != nil {
-		return "", nil, NewErrXMLParseFailed(err)
+		return nil, NewErrXMLParseFailed(err)
 	}
 
 	var editor FeedEditor
@@ -42,7 +42,7 @@ func Transform(feed io.Reader, conf TransformConfig) (string, io.WriterTo, error
 	} else if format == "feed" {
 		editor = AtomFeedEditor{}
 	} else {
-		return "", nil, ErrUnExpectedFormat(format)
+		return nil, ErrUnExpectedFormat(format)
 	}
 
 	editor.UpdateFeedTitle(doc)
@@ -57,7 +57,7 @@ func Transform(feed io.Reader, conf TransformConfig) (string, io.WriterTo, error
 		editor.TapRedirector(doc, conf)
 	}
 
-	return format, doc, nil
+	return doc, nil
 }
 
 type FeedEditor interface {

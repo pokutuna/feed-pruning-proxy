@@ -58,16 +58,17 @@ func ProxyFeed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	useRedirector := q.Get("org") != "" || q.Get("channel") != ""
 	_, diet := q["diet"]
 	conf := TransformConfig{
 		ProxyOrigin:   ServerOrigin(r.Host),
 		Org:           q.Get("org"),
 		Channel:       q.Get("channel"),
-		UseRedirector: q.Get("org") != "" || q.Get("channel") != "",
+		UseRedirector: useRedirector,
 		Diet:          diet,
 	}
 
-	_, wt, err := Transform(resp.Body, conf)
+	wt, err := Transform(resp.Body, conf)
 	if err != nil {
 		var code int
 		var msg string
@@ -82,10 +83,7 @@ func ProxyFeed(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.WriteHeader(code)
-		fmt.Fprintln(w, http.StatusText(code))
-		if msg != "" {
-			fmt.Fprintln(w, msg)
-		}
+		fmt.Fprintf(w, "%s\n%s\n", http.StatusText(code), msg)
 		log.Warningf(r.Context(), "Failed to transfrom a feed: %v", err)
 
 		return
