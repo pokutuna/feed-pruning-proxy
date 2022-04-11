@@ -59,13 +59,13 @@ func ProxyFeed(w http.ResponseWriter, r *http.Request) {
 	}
 
 	useRedirector := q.Get("org") != "" || q.Get("channel") != ""
-	_, diet := q["diet"]
+	_, isDietMode := q["diet"]
 	conf := TransformConfig{
 		ProxyOrigin:   ServerOrigin(r.Host),
 		Org:           q.Get("org"),
 		Channel:       q.Get("channel"),
 		UseRedirector: useRedirector,
-		Diet:          diet,
+		DietMode:      isDietMode,
 	}
 
 	wt, err := Transform(resp.Body, conf)

@@ -26,7 +26,7 @@ type TransformConfig struct {
 	Org           string
 	Channel       string
 	UseRedirector bool
-	Diet          bool // when false = remove
+	DietMode      bool
 }
 
 func Transform(feed io.Reader, conf TransformConfig) (io.WriterTo, error) {
@@ -47,7 +47,7 @@ func Transform(feed io.Reader, conf TransformConfig) (io.WriterTo, error) {
 
 	editor.UpdateFeedTitle(doc)
 
-	if conf.Diet {
+	if conf.DietMode {
 		editor.DietEntryContent(doc)
 	} else {
 		editor.RemoveEntryContent(doc)
