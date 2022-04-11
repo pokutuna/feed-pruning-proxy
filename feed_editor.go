@@ -2,63 +2,11 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"net/url"
 
 	"github.com/beevik/etree"
 	"github.com/microcosm-cc/bluemonday"
 )
-
-type ErrXMLParseFailed error
-
-func NewErrXMLParseFailed(err error) ErrXMLParseFailed {
-	return ErrXMLParseFailed(fmt.Errorf("failed to parse: %w", err))
-}
-
-type ErrUnExpectedFormat string
-
-func (e ErrUnExpectedFormat) Error() string {
-	return fmt.Sprintf("unexpected feed format: %s", string(e))
-}
-
-type TransformConfig struct {
-	ProxyOrigin   string
-	Org           string
-	Channel       string
-	UseRedirector bool
-	DietMode      bool
-}
-
-func Transform(feed io.Reader, conf TransformConfig) (io.WriterTo, error) {
-	doc := etree.NewDocument()
-	if _, err := doc.ReadFrom(feed); err != nil {
-		return nil, NewErrXMLParseFailed(err)
-	}
-
-	var editor FeedEditor
-	format := doc.Root().Tag
-	if format == "rss" {
-		editor = RSSFeedEditor{}
-	} else if format == "feed" {
-		editor = AtomFeedEditor{}
-	} else {
-		return nil, ErrUnExpectedFormat(format)
-	}
-
-	editor.UpdateFeedTitle(doc)
-
-	if conf.DietMode {
-		editor.DietEntryContent(doc)
-	} else {
-		editor.RemoveEntryContent(doc)
-	}
-
-	if conf.UseRedirector {
-		editor.TapRedirector(doc, conf)
-	}
-
-	return doc, nil
-}
 
 type FeedEditor interface {
 	// Add "(with slack-feed-proxy)" notice to feed title
@@ -74,32 +22,6 @@ type FeedEditor interface {
 	// Replace entry links with redirector
 	// The flood of feeds no one reading flushes out human conversations. Stop Robots Empire!
 	TapRedirector(doc *etree.Document, conf TransformConfig)
-}
-
-func addTitleNotice(title string) string {
-	return fmt.Sprintf("%s (with slack-feed-proxy)", title)
-}
-
-func tapRedirector(link string, conf TransformConfig) string {
-	u, _ := url.Parse(conf.ProxyOrigin)
-	u.Path = "/r"
-
-	q := u.Query()
-	q.Set("url", link)
-	if conf.Org != "" {
-		q.Set("org", conf.Org)
-	}
-	if conf.Channel != "" {
-		q.Set("channel", conf.Channel)
-	}
-	u.RawQuery = q.Encode()
-
-	return u.String()
-}
-
-func stripTags(text string) string {
-	p := bluemonday.StrictPolicy()
-	return p.Sanitize(text)
 }
 
 type RSSFeedEditor struct{}
@@ -172,4 +94,30 @@ func (e AtomFeedEditor) TapRedirector(doc *etree.Document, conf TransformConfig)
 			d.CreateAttr("href", tapRedirector(u, conf))
 		}
 	}
+}
+
+func addTitleNotice(title string) string {
+	return fmt.Sprintf("%s (with slack-feed-proxy)", title)
+}
+
+func tapRedirector(link string, conf TransformConfig) string {
+	u, _ := url.Parse(conf.ProxyOrigin)
+	u.Path = "/r"
+
+	q := u.Query()
+	q.Set("url", link)
+	if conf.Org != "" {
+		q.Set("org", conf.Org)
+	}
+	if conf.Channel != "" {
+		q.Set("channel", conf.Channel)
+	}
+	u.RawQuery = q.Encode()
+
+	return u.String()
+}
+
+func stripTags(text string) string {
+	p := bluemonday.StrictPolicy()
+	return p.Sanitize(text)
 }
