@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"text/template"
 
 	"google.golang.org/appengine/v2"
 )
@@ -13,12 +12,4 @@ func main() {
 	http.HandleFunc("/r", Redirect)
 
 	appengine.Main()
-}
-
-func Index(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	t := template.Must(template.ParseFiles("index.html"))
-	t.Execute(w, map[string]string{
-		"origin": ServerOrigin(r.Host),
-	})
 }

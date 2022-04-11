@@ -29,7 +29,7 @@ func Redirect(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 
 	url := q.Get("url")
-	if url == "" {
+	if url == "" || strings.HasPrefix(url, ServerOrigin(r.Host)) {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintln(w, http.StatusText(http.StatusBadRequest))
 		return

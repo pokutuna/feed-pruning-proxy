@@ -1,36 +1,87 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>slack-feed-proxy</title>
-    <style>
-      body {
-        margin: 2em;
-      }
-      code {
-        font-size: large;
-      }
-      li {
-        margin-bottom: 1em;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>slack-feed-proxy</h1>
-    <a href="https://github.com/pokutuna/slack-feed-proxy">https://github.com/pokutuna/slack-feed-proxy</a>
+
+<head>
+  <meta charset="utf-8">
+  <title>slack-feed-proxy</title>
+  <style>
+    body {
+      margin: 2em;
+    }
+
+    code {
+      font-size: large;
+    }
+
+    li {
+      margin-bottom: 1em;
+    }
+
+    form {
+      margin-top: 4em;
+      max-width: 600px;
+    }
+
+    form input {
+      display: inline-block;
+      box-sizing: border-box;
+    }
+
+    form input[name="feed"] {
+      width: 100%;
+    }
+
+    form ul {
+      padding-inline: 0;
+    }
+
+    form li {
+      list-style: none;
+      margin-bottom: 0.5em;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>slack-feed-proxy</h1>
+  <a href="https://github.com/pokutuna/slack-feed-proxy">https://github.com/pokutuna/slack-feed-proxy</a>
+  <ul>
+    <li>
+      <code>{{.origin}}/p?feed={url}</code><br />
+      remove body contents (e.g. description, summary, content)
+    </li>
+    <li>
+      <code>{{.origin}}/p?feed={url}&diet</code><br />
+      (diet mode) remove markups from body contents, keep texts
+    </li>
+    <li>
+      <code>{{.origin}}/p?feed={url}&org={org}&channel={channel}</code><br />
+      replace entry urls with redirector to log where clicks are from
+    </li>
+  </ul>
+
+  <form method="POST" action="/">
+    <h4>url generator</h4>
     <ul>
       <li>
-        <code>{{.origin}}/p?feed={url}</code><br />
-        remove body contents (e.g. description, summary, content)
+        <label for="feed">feed url (rss, atom)</label><br />
+        <input type="url" name="feed" placeholder="https://example.com/feed" pattern="https?://.*" required id="feed" />
       </li>
       <li>
-        <code>{{.origin}}/p?feed={url}&diet</code><br />
-        remove markups from body contents
+        <label for="org">org</label>
+        <input type="text" name="org" id="org" placeholder="heisha" />
+        <label for="channel">channel</label>
+        <input type="text" name="channel" id="channel" placeholder="times_takuya-a" />
       </li>
       <li>
-        <code>{{.origin}}/p?feed={url}&org={org}&channel={channel}</code><br />
-        enable redirector to log where clicks are from
+        <label for="diet">diet mode</label>
+        <input type="checkbox" name="diet" id="diet" />
+      </li>
+      <li>
+        <button type="submit">generate</button>
       </li>
     </ul>
-  </body>
+  </form>
+</body>
+
 </html>
