@@ -4,6 +4,6 @@
     "allow-unauthenticated": true,
     "memory": "128Mi",
     "cpu": "1",
-    "http2": true
+    "http2": false
   }
 }
