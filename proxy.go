@@ -26,7 +26,7 @@ func ProxyFeed(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
 	req, _ := http.NewRequestWithContext(ctx, "GET", feed, nil)
-	req.Header.Set("User-Agent", fmt.Sprintf("slack-feed-proxy (%s)", r.Host))
+	req.Header.Set("User-Agent", fmt.Sprintf("feed-pruning-proxy (%s)", r.Host))
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

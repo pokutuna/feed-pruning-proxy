@@ -52,7 +52,7 @@ func TestRSSFeedEditor(t *testing.T) {
 		editor.UpdateFeedTitle(doc)
 
 		title := doc.FindElement("/rss/channel/title").Text()
-		assert.Equal(t, "ぽ靴な缶 (with slack-feed-proxy)", title)
+		assert.Equal(t, "ぽ靴な缶 (with feed-pruning-proxy)", title)
 	})
 
 	t.Run("RemoveEntryContent", func(t *testing.T) {
@@ -135,7 +135,7 @@ func TestAtomFeedEditor(t *testing.T) {
 		editor.UpdateFeedTitle(doc)
 
 		title := doc.FindElement("/feed/title").Text()
-		assert.Equal(t, "ぽ靴な缶 (with slack-feed-proxy)", title)
+		assert.Equal(t, "ぽ靴な缶 (with feed-pruning-proxy)", title)
 	})
 
 	t.Run("RemoveEntryContent", func(t *testing.T) {

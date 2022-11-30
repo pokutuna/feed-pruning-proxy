@@ -9,7 +9,7 @@ import (
 )
 
 type FeedEditor interface {
-	// Add "(with slack-feed-proxy)" notice to feed title
+	// Add "(with feed-pruning-proxy)" notice to feed title
 	UpdateFeedTitle(doc *etree.Document)
 
 	// Remove entry contents
@@ -97,7 +97,7 @@ func (e AtomFeedEditor) TapRedirector(doc *etree.Document, conf TransformConfig)
 }
 
 func addTitleNotice(title string) string {
-	return fmt.Sprintf("%s (with slack-feed-proxy)", title)
+	return fmt.Sprintf("%s (with feed-pruning-proxy)", title)
 }
 
 func tapRedirector(link string, conf TransformConfig) string {

@@ -1,5 +1,5 @@
 {
-  "name": "slack-feed-proxy",
+  "name": "feed-pruning-proxy",
   "options": {
     "allow-unauthenticated": true,
     "memory": "128Mi",

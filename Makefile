@@ -1,5 +1,5 @@
 # REPLACE THIS WITH YOUR PROJECT_ID
-PROJECT := slack-feed-proxy
+PROJECT := feed-pruning-proxy
 
 GCLOUD := gcloud --project $(PROJECT)
 
@@ -10,7 +10,7 @@ deploy:
 
 .PHONY: localup
 localup:
-	go build && echo 'open http://localhost:8080' && GOOGLE_CLOUD_PROJECT=$(PROJECT) ./slack-feed-proxy
+	go build && echo 'open http://localhost:8080' && GOOGLE_CLOUD_PROJECT=$(PROJECT) ./feed-pruning-proxy
 
 .PHONY: test
 test:
