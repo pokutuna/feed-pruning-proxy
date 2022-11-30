@@ -77,7 +77,10 @@ func ProxyFeed(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/xml") // or respect the original content-type?
 	w.Header().Set("Cache-Control", "public, max-age=300")
 	w.WriteHeader(http.StatusOK)
-	wt.WriteTo(w)
+	_, err = wt.WriteTo(w)
+	if err != nil {
+		log.Errorf(r.Context(), err.Error())
+	}
 }
 
 func ServerOrigin(host string) string {

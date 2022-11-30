@@ -4,6 +4,8 @@ import (
 	"html/template"
 	"net/http"
 	"net/url"
+
+	"google.golang.org/appengine/v2/log"
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
@@ -17,9 +19,12 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	t := template.Must(template.ParseFiles("index.html"))
-	t.Execute(w, map[string]string{
+	err := t.Execute(w, map[string]string{
 		"origin": ServerOrigin(r.Host),
 	})
+	if err != nil {
+		log.Errorf(r.Context(), err.Error())
+	}
 }
 
 func generateFeedURLWithProxy(r *http.Request) (string, error) {
