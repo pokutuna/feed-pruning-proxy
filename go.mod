@@ -1,4 +1,4 @@
-module github.com/pokutuna/slack-feed-proxy
+module github.com/pokutuna/feed-pruning-proxy
 
 go 1.16
 
