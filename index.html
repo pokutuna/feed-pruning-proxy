@@ -46,6 +46,7 @@
 <body>
   <h1>feed-pruning-proxy</h1>
   <a href="https://github.com/pokutuna/feed-pruning-proxy">https://github.com/pokutuna/feed-pruning-proxy</a>
+  <h3>Features</h3>
   <ul>
     <li>
       <code>{{.origin}}/p?feed={url}</code><br />
@@ -57,26 +58,29 @@
     </li>
     <li>
       <code>{{.origin}}/p?feed={url}&org={org}&channel={channel}</code><br />
-      replace entry urls with redirector to log where clicks are from
+      replace entry urls with redirector to log where the click came from
     </li>
   </ul>
 
   <form method="POST" action="/">
-    <h4>url generator</h4>
+    <h3>URL Generator</h3>
     <ul>
       <li>
         <label for="feed">feed url (rss, atom)</label><br />
         <input type="url" name="feed" placeholder="https://example.com/feed" pattern="https?://.*" required id="feed" />
       </li>
       <li>
-        <label for="org">org</label>
-        <input type="text" name="org" id="org" placeholder="heisha" />
-        <label for="channel">channel</label>
-        <input type="text" name="channel" id="channel" placeholder="times_takuya-a" />
-      </li>
-      <li>
         <label for="diet">diet mode</label>
         <input type="checkbox" name="diet" id="diet" />
+      </li>
+      <li>
+        <fieldset>
+          <legend>open from</legend>
+          <label for="org">org</label>
+          <input type="text" name="org" id="org" placeholder="heisha" />
+          <label for="channel">channel</label>
+          <input type="text" name="channel" id="channel" placeholder="times_takuya-a" />
+        </fieldset>
       </li>
       <li>
         <button type="submit">generate</button>
