@@ -37,12 +37,18 @@ func (e RSSFeedEditor) RemoveEntryContent(doc *etree.Document) {
 		if d := i.SelectElement("description"); d != nil {
 			i.RemoveChild(d)
 		}
+		if d := i.SelectElement("content:encoded"); d != nil {
+			i.RemoveChild(d)
+		}
 	}
 }
 
 func (e RSSFeedEditor) DietEntryContent(doc *etree.Document) {
 	for _, i := range doc.FindElements("/rss/channel/item") {
 		if d := i.SelectElement("description"); d != nil {
+			d.SetText(stripTags(d.Text()))
+		}
+		if d := i.SelectElement("content:encoded"); d != nil {
 			d.SetText(stripTags(d.Text()))
 		}
 	}
