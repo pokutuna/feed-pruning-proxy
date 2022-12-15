@@ -33,6 +33,13 @@ func TestRSSFeedEditor(t *testing.T) {
                 <pubDate>Thu, 02 Dec 2021 22:00:00 +0900</pubDate>
                 <guid isPermalink="false">hatenablog://entry/13574176438038846201</guid>
             </item>
+            <item>
+                <title>Title 3</title>
+                <link>https://blog.pokutuna.com/entry/3</link>
+                <content:encoded><![CDATA[Hello This is a <a href="https://example.test">link</a>]]></content:encoded>
+                <pubDate>Thu, 03 Dec 2021 03:00:00 +0900</pubDate>
+                <guid isPermalink="false">hatenablog://entry/3</guid>
+            </item>
         </channel>
     </rss>
     `
@@ -56,26 +63,38 @@ func TestRSSFeedEditor(t *testing.T) {
 	})
 
 	t.Run("RemoveEntryContent", func(t *testing.T) {
-		reload()
+		t.Run("description", func(t *testing.T) {
+			reload()
+			item := doc.FindElement("/rss/channel/item")
+			assert.NotNil(t, item.SelectElement("description"))
 
-		item := doc.FindElement("/rss/channel/item")
-		assert.NotNil(t, item.SelectElement("description"))
+			editor.RemoveEntryContent(doc)
+			assert.Nil(t, item.SelectElement("description"))
+		})
 
-		editor.RemoveEntryContent(doc)
-		assert.Nil(t, item.SelectElement("description"))
+		t.Run("content:encoded", func(t *testing.T) {
+			reload()
+			item := doc.FindElements("/rss/channel/item")[2]
+			assert.NotNil(t, item.SelectElement("content:encoded"))
+
+			editor.RemoveEntryContent(doc)
+			assert.Nil(t, item.SelectElement("content:encoded"))
+		})
 	})
 
 	t.Run("DietEntryContent", func(t *testing.T) {
 		reload()
 
 		items := doc.FindElements("/rss/channel/item")
-		item1 := items[0] // Escaped
-		item2 := items[1] // CDATA
+		item1 := items[0] // description with Escaped
+		item2 := items[1] // description with CDATA
+		item3 := items[2] // content:encoded with CDATA
 
 		editor.DietEntryContent(doc)
 
 		assert.Equal(t, "Hello This is a link", item1.SelectElement("description").Text())
 		assert.Equal(t, "Hello This is a link", item2.SelectElement("description").Text())
+		assert.Equal(t, "Hello This is a link", item3.SelectElement("content:encoded").Text())
 	})
 
 	t.Run("TapRedirector", func(t *testing.T) {
