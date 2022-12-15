@@ -102,6 +102,44 @@ func (e AtomFeedEditor) TapRedirector(doc *etree.Document, conf TransformConfig)
 	}
 }
 
+type RDFFeedEditor struct{}
+
+func (e RDFFeedEditor) UpdateFeedTitle(doc *etree.Document) {
+	if i := doc.FindElement("/rdf:RDF/channel[@rdf:about]/title"); i != nil {
+		i.SetText(addTitleNotice(i.Text()))
+	}
+}
+
+func (e RDFFeedEditor) RemoveEntryContent(doc *etree.Document) {
+	for _, i := range doc.FindElements("/rdf:RDF/item[@rdf:about]") {
+		if d := i.SelectElement("description"); d != nil {
+			i.RemoveChild(d)
+		}
+		if d := i.SelectElement("content:encoded"); d != nil {
+			i.RemoveChild(d)
+		}
+	}
+}
+
+func (e RDFFeedEditor) DietEntryContent(doc *etree.Document) {
+	for _, i := range doc.FindElements("/rdf:RDF/item[@rdf:about]") {
+		if d := i.SelectElement("description"); d != nil {
+			d.SetText(stripTags(d.Text()))
+		}
+		if d := i.SelectElement("content:encoded"); d != nil {
+			d.SetText(stripTags(d.Text()))
+		}
+	}
+}
+
+func (e RDFFeedEditor) TapRedirector(doc *etree.Document, conf TransformConfig) {
+	for _, i := range doc.FindElements("/rdf:RDF/item[@rdf:about]") {
+		if d := i.SelectElement("link"); d != nil {
+			d.SetText(tapRedirector(d.Text(), conf))
+		}
+	}
+}
+
 func addTitleNotice(title string) string {
 	return fmt.Sprintf("%s (with feed-pruning-proxy)", title)
 }

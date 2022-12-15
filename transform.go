@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/beevik/etree"
 )
@@ -38,11 +39,13 @@ func Transform(feed io.Reader, conf TransformConfig) (io.WriterTo, error) {
 	}
 
 	var editor FeedEditor
-	format := doc.Root().Tag
+	format := strings.ToLower(doc.Root().Tag)
 	if format == "rss" {
 		editor = RSSFeedEditor{}
 	} else if format == "feed" {
 		editor = AtomFeedEditor{}
+	} else if format == "rdf" {
+		editor = RDFFeedEditor{}
 	} else {
 		return nil, ErrUnExpectedFormat(format)
 	}
