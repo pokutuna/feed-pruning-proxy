@@ -187,3 +187,86 @@ func TestAtomFeedEditor(t *testing.T) {
 	t.Run("TapRedirector", func(t *testing.T) {
 	})
 }
+
+func TestRDFFeedEditor(t *testing.T) {
+	var rdffeed = `
+    <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://purl.org/rss/1.0/" xmlns:admin="http://webns.net/mvcb/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:hatena="http://www.hatena.ne.jp/info/xmlns#" xmlns:syn="http://purl.org/rss/1.0/modules/syndication/" xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/">
+      <channel rdf:about="https://blog.pokutuna.com/">
+        <title>ぽ靴な缶</title>
+        <link>https://blog.pokutuna.com/</link>
+        <description>pokutuna</description>
+        <items>
+          <rdf:Seq>
+            <rdf:li rdf:resource="https://blog.pokutuna.com/entry/1"/>
+            <rdf:li rdf:resource="https://blog.pokutuna.com/entry/2"/>
+            <rdf:li rdf:resource="https://blog.pokutuna.com/entry/3"/>
+          </rdf:Seq>
+        </items>
+      </channel>
+      <item rdf:about="https://blog.pokutuna.com/entry/1">
+        <title>Title 1</title>
+        <link>https://blog.pokutuna.com/entry/1</link>
+        <description>description</description>
+        <dc:creator>pokutuna</dc:creator>
+        <dc:date>2022-01-01T00:00:00Z</dc:date>
+        <content:encoded>Hello This is a &lt;a href=&quot;https://example.test&quot;&gt;link&lt;/a&gt;</content:encoded>
+        <dc:subject>HTML Encoded</dc:subject>
+      </item>
+      <item rdf:about="https://blog.pokutuna.com/entry/2">
+        <title>Title 2</title>
+        <link>https://blog.pokutuna.com/entry/2</link>
+        <description>description</description>
+        <dc:creator>pokutuna</dc:creator>
+        <dc:date>2022-02-02T00:00:00Z</dc:date>
+        <content:encoded><![CDATA[Hello This is a <a href="https://example.test">link</a>]]></content:encoded>
+        <dc:subject>CDATA</dc:subject>
+      </item>
+    </rdf:RDF>
+    `
+
+	editor := RDFFeedEditor{}
+	var doc *etree.Document
+
+	reload := func() {
+		doc = etree.NewDocument()
+		_, err := doc.ReadFrom(strings.NewReader(rdffeed))
+		assert.NoError(t, err)
+	}
+
+	t.Run("UpdateFeedTitle", func(t *testing.T) {
+		reload()
+
+		editor.UpdateFeedTitle(doc)
+
+		title := doc.FindElement("/rdf:RDF/channel[@rdf:about]/title").Text()
+		assert.Equal(t, "ぽ靴な缶 (with feed-pruning-proxy)", title)
+	})
+
+	t.Run("RemoveEntryContent", func(t *testing.T) {
+		reload()
+		item := doc.FindElement("/rdf:RDF/item[@rdf:about]")
+		assert.NotNil(t, item.SelectElement("description"))
+		assert.NotNil(t, item.SelectElement("content:encoded"))
+
+		editor.RemoveEntryContent(doc)
+		assert.Nil(t, item.SelectElement("description"))
+		assert.Nil(t, item.SelectElement("content:encoded"))
+	})
+
+	t.Run("DietEntryContent", func(t *testing.T) {
+		reload()
+
+		items := doc.FindElements("/rdf:RDF/item[@rdf:about]")
+		item1 := items[0] // escaped
+		item2 := items[1] // CDATA
+
+		editor.DietEntryContent(doc)
+
+		assert.Equal(t, "Hello This is a link", item1.SelectElement("content:encoded").Text())
+		assert.Equal(t, "Hello This is a link", item2.SelectElement("content:encoded").Text())
+	})
+
+	t.Run("TapRedirector", func(t *testing.T) {
+	})
+
+}
